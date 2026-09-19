@@ -1,0 +1,571 @@
+<p-card>
+    <div class="flex justify-between">
+
+        <p-button [pTooltip]="'Create job'" (click)="openDialog()"><i class="pi pi-plus"></i></p-button>
+        <div class="mb-10 mr-10">
+            <p-iconfield iconPosition="left">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input pInputText pSize="small" type="text"
+                       (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search"/>
+            </p-iconfield>
+        </div>
+    </div>
+    <p-table
+        [value]="jobs()"
+        #dt1
+        [paginator]="'true'" [rows]="12"
+        [globalFilterFields]="['title','description','minGpa','deadline','minExperience']"
+    >
+        <ng-template #header>
+            <tr class="hidden md:table-row w-full">
+                <th>
+                    №
+                </th>
+                <th>
+                    title
+                </th>
+                <th>
+                    description
+                </th>
+                <th>
+                    minGpa
+                </th>
+                <th>
+                    deadline
+                </th>
+                <th>
+                    minExperience
+                </th>
+                <th>
+                    status
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-job let-rowIndex="rowIndex">
+
+            @let status = getJobStatus(job.isActive);
+
+            <!-- Desktop -->
+            <tr class="hidden md:table-row">
+                <td>
+                    {{ rowIndex + 1 }}
+                </td>
+
+                <td>
+                    {{ job.title }}
+                </td>
+
+                <td>
+                    {{ job.description }}
+                </td>
+
+                <td>
+                    {{ job.minGpa }}
+                </td>
+
+                <td>
+                    {{ job.deadline | date:'dd.MM.yy HH:mm' }}
+                </td>
+
+                <td>
+                    {{ job.minExperience }}
+                </td>
+
+                <td>
+                    <p-tag
+                        [severity]="status.type"
+                        [value]="status.label"
+                    />
+                </td>
+
+                <td>
+                    <div class="flex gap-1">
+                        <p-button
+                            icon="pi pi-eye"
+                            pTooltip="View detail"
+                            tooltipPosition="top"
+                            severity="primary"
+                            variant="outlined"
+                            size="small"
+                            (onClick)="viewJob(job)"
+                        />
+
+                        <p-button
+                            icon="pi pi-pencil"
+                            pTooltip="Edit"
+                            tooltipPosition="top"
+                            severity="primary"
+                            variant="outlined"
+                            size="small"
+                            (onClick)="editJob(job)"
+                        />
+
+                        <p-button
+                            icon="pi pi-trash"
+                            pTooltip="Delete"
+                            tooltipPosition="top"
+                            severity="danger"
+                            variant="outlined"
+                            size="small"
+                            (onClick)="deleteJob(job.id, $event)"
+                        />
+                    </div>
+                </td>
+            </tr>
+
+            <!-- Mobile -->
+            <tr class="md:hidden">
+                <td colspan="8" class="p-0! border-0! ">
+                    <div class="border rounded-md p-2 !mt-2 shadow-sm">
+
+                        <div class="flex justify-between items-center gap-2">
+                            <div class="min-w-0">
+                                <h4 class="font-medium text-xs! truncate">
+                                    {{ job.title }}
+                                </h4>
+
+                                <span class="text-[10px] text-gray-400">
+                        #{{ rowIndex + 1 }}
+                    </span>
+                            </div>
+
+                            <p-tag
+                                [severity]="status.type"
+                                [value]="status.label"
+                                styleClass="text-[10px]!"
+                            />
+                        </div>
+
+                        <p class="text-[11px] text-gray-500 mt-1 line-clamp-3">
+                            {{ job.description }}
+                        </p>
+
+                        <div class="grid grid-cols-3 gap-1 mt-2 text-[10px]">
+
+                            <div>
+                                <span class="text-gray-400 block">GPA</span>
+                                <span class="font-medium">{{ job.minGpa }}</span>
+                            </div>
+
+                            <div>
+                                <span class="text-gray-400 block">Exp.</span>
+                                <span class="font-medium">{{ job.minExperience }}y</span>
+                            </div>
+
+                            <div>
+                                <span class="text-gray-400 block">Deadline</span>
+                                <span class="font-medium">
+                        {{ job.deadline | date:'dd.MM.yy' }}
+                    </span>
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-end gap-1 mt-2 pt-1 border-t">
+
+                            <p-button
+                                icon="pi pi-eye"
+                                size="small"
+                                variant="outlined"
+                                severity="primary"
+                                [style]="{width:'26px', height:'26px'}"
+                                (onClick)="viewJob(job)"
+                            />
+
+                            <p-button
+                                icon="pi pi-pencil"
+                                size="small"
+                                variant="outlined"
+                                severity="primary"
+                                [style]="{width:'26px', height:'26px'}"
+                                (onClick)="editJob(job)"
+                            />
+
+                            <p-button
+                                icon="pi pi-trash"
+                                size="small"
+                                variant="outlined"
+                                severity="danger"
+                                [style]="{width:'26px', height:'26px'}"
+                                (onClick)="deleteJob(job.id, $event)"
+                            />
+
+                        </div>
+
+                    </div>
+                </td>
+            </tr>
+
+        </ng-template>
+
+        <ng-template #emptymessage >
+            <tr>
+                <td colspan="8" class="!text-center">No data</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-card>
+
+
+<p-dialog
+    [visible]='visible()'
+    [modal]="true"
+    (visibleChange)="visible.set($event)"
+    class="w-100!"
+    [style]="{width:'400px'}"
+    [header]="'Create a job'"
+>
+
+    <div class="w-full">
+        <form (ngSubmit)="createJob()">
+            <div class="w-full mb-3 ">
+                <label class="block mb-2 font-medium">
+                    Job Title
+                </label>
+
+                <input
+                    pInputText
+                    [field]="jobForm.title"
+                    class="w-full"
+                    placeholder="Frontend Developer"
+                />
+            </div>
+
+            <div class="col-12 mb-3">
+                <label class="block mb-2 font-medium">
+                    Description
+                </label>
+
+                <input
+                    pInputText
+                    [field]="jobForm.description"
+                    class="w-full"
+                    placeholder="Job description..."
+            />
+            </div>
+
+            <div class="col-12 mb-3 md:col-6">
+                <label class="block mb-2 font-medium">
+                    Minimum GPA
+                </label>
+
+                <p-inputNumber
+                    [field]="jobForm.minGpa"
+                    [min]="0"
+                    [max]="4"
+                    [minFractionDigits]="1"
+                    [maxFractionDigits]="2"
+                    class="w-full"
+                />
+            </div>
+
+
+            <div class="col-12 mb-3 md:col-6">
+                <label class="block mb-2 font-medium">
+                    Minimum Experience
+                </label>
+
+                <p-inputNumber
+                    [field]="jobForm.minExperience"
+                    [min]="0"
+                    suffix=" months"
+                    class="w-full"
+                />
+            </div>
+
+            <div class="col-12">
+                <label class="block mb-2 font-medium">
+                    Application Deadline
+                </label>
+
+                <p-datepicker
+                    [field]="jobForm.deadline"
+                    [showIcon]="true"
+                    [minDate]="today"
+                    fluid
+                    dateFormat="yy-mm-dd"
+                    class="w-full"
+                    styleClass="w-full"></p-datepicker>
+            </div>
+
+
+            <div class="">
+
+                <div class="flex items-center justify-between mt-2 mb-2">
+
+                    <label class="font-medium">
+                        Required Skills
+                    </label>
+
+                    <p-button
+                        type="button"
+                        icon="pi pi-plus"
+                        label="Add Skill"
+                        size="small"
+                        [text]="true"
+                        (onClick)="addSkill()"
+                    />
+
+                </div>
+
+                @for (skill of jobModel().skills; track $index) {
+
+                    <div class="flex items-center gap-2 mb-2">
+
+                        <p-select
+                            [options]="skillsOptions()"
+                            optionLabel="name"
+                            optionValue="id"
+                            [field]="jobForm.skills[$index].skillId"
+                            placeholder="Select skill"
+                            class="flex-1"
+                        />
+
+                        <p-inputNumber
+                            [field]="jobForm.skills[$index].requiredLevel"
+                            [min]="1"
+                            [max]="5"
+                            placeholder="Level"
+                            styleClass="w-6rem"
+                        />
+
+                        <p-button
+                            type="button"
+                            icon="pi pi-trash"
+                            severity="danger"
+                            [text]="true"
+                            [rounded]="true"
+                            (onClick)="removeSkill($index)"
+                        />
+
+                    </div>
+                }
+            </div>
+
+            <div
+                class="flex justify-end gap-2 border-top-1 pt-3 mt-3">
+
+                <p-button
+                    type="button"
+                    label="Cancel"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="closeDialog()"
+                />
+
+                <p-button
+                    type="submit"
+                    label="Create Job"
+                    icon="pi pi-plus"
+                    [loading]="loading()"
+                    [disabled]="jobForm().invalid()"
+                />
+            </div>
+        </form>
+    </div>
+</p-dialog>
+<p-dialog
+    [visible]="editVisible()"
+    (visibleChange)="editVisible.set($event)"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [closable]="true"
+>
+    <ng-template pTemplate="header">
+        <div class="flex items-center gap-2">
+            <i class="pi pi-pencil text-primary"></i>
+
+            <span class="font-semibold">
+                Edit Job
+            </span>
+        </div>
+    </ng-template>
+
+    <form (ngSubmit)="updateJob()">
+
+        <div class="flex flex-col gap-3">
+
+            <div>
+                <label class="block mb-2 font-medium">
+                    Job Title
+                </label>
+
+                <input
+                    pInputText
+                    [field]="editJobForm.title"
+                    class="w-full"
+                />
+            </div>
+
+            <div>
+                <label class="block mb-2 font-medium">
+                    Description
+                </label>
+
+                <input
+                    pInputText
+                    [field]="editJobForm.description"
+                    class="w-full"
+                />
+            </div>
+
+
+
+                <div class="col-24">
+                    <label class="block mb-2 font-medium">
+                        Minimum GPA
+                    </label>
+
+                    <p-inputNumber
+                        [field]="editJobForm.minGpa"
+                        [min]="0"
+                        [max]="4"
+                        [minFractionDigits]="1"
+                        [maxFractionDigits]="2"
+                        styleClass="w-full"
+                    />
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <label class="block mb-2 font-medium">
+                        Experience
+                    </label>
+
+                    <p-inputNumber
+                        [field]="editJobForm.minExperience"
+                        [min]="0"
+                        suffix=" months"
+                        styleClass="w-full"
+                    />
+                </div>
+
+
+            <div>
+                <label class="block mb-2 font-medium">
+                    Application Deadline
+                </label>
+
+                <p-datepicker
+                    [field]="editJobForm.deadline"
+                    [showIcon]="true"
+                    fluid
+                    dateFormat="yy-mm-dd"
+                    styleClass="w-full"></p-datepicker>
+            </div>
+
+            <div>
+
+                <div class="flex items-center justify-between mb-2">
+                    <label class="font-medium">
+                        Required Skills
+                    </label>
+
+                    <p-button
+                        type="button"
+                        icon="pi pi-plus"
+                        label="Add Skill"
+                        size="small"
+                        [text]="true"
+                        (onClick)="addEditSkill()"
+                    />
+                </div>
+
+                @for (skill of editJobModel().skills; track $index) {
+
+                    <div class="flex items-center gap-2 mb-2">
+
+                        <p-select
+                            [options]="skillsOptions()"
+                            optionLabel="name"
+                            optionValue="id"
+                            [field]="editJobForm.skills[$index].skillId"
+                            placeholder="Skill"
+                            class="flex-1"
+                        />
+
+                        <p-inputNumber
+                            [field]="editJobForm.skills[$index].requiredLevel"
+                            [min]="1"
+                            [max]="5"
+                            placeholder="Level"
+                            styleClass="w-6rem"
+                        />
+
+                        <p-button
+                            type="button"
+                            icon="pi pi-trash"
+                            severity="danger"
+                            [text]="true"
+                            [rounded]="true"
+                            (onClick)="removeEditSkill($index)"
+                        />
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+        <div class="flex justify-end gap-2 border-top-1  pt-3 mt-4">
+
+            <p-button
+                type="button"
+                label="Cancel"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="editVisible.set(false)"
+            />
+
+            <p-button
+                type="submit"
+                label="Save Changes"
+                icon="pi pi-check"
+
+                [loading]="loading()"
+            />
+
+        </div>
+
+    </form>
+</p-dialog>
+<p-dialog
+    header="Job Details"
+    [visible]="viewVisible()"
+    [draggable]="false"
+    (visibleChange)="viewVisible.set($event)"
+    [modal]="true"
+    [closable]="true"
+    [style]="{ width: '600px' }"
+>
+    @if (selectedJob(); as job) {
+        <div>
+            <h3>{{ job.title }}</h3>
+
+            <p>{{ job.description }}</p>
+
+            <p>
+                <strong>Min GPA:</strong>
+                {{ job.minGpa }}
+            </p>
+
+            <p>
+                <strong>Experience:</strong>
+                {{ job.minExperience }} years
+            </p>
+
+            <p>
+                <strong>Deadline:</strong>
+                {{ job.deadline | date:'dd.MM.yyyy' }}
+            </p>
+        </div>
+    }
+</p-dialog>
+<p-toast/>
+<p-confirmdialog></p-confirmdialog>

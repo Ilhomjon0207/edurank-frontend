@@ -1,0 +1,295 @@
+<p-card>
+    <div class="mb-10 mt-4 mr-10 flex w-full! justify-end">
+        <p-iconfield iconPosition="left">
+            <p-inputicon>
+                <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input pInputText pSize="small" type="text"
+                   (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search"/>
+        </p-iconfield>
+    </div>
+    <p-table #dt1 [value]="applications()" [paginator]="'true'" [rows]="12"
+             [globalFilterFields]="['id','jobTitle','name','status','appliedAt']">
+        <ng-template #header>
+            <tr class="hidden md:table-row">
+                <th pSortableColumn="id">
+                    №
+                    <p-sortIcon field="id"/>
+                </th>
+                <th pSortableColumn="jobTitle">
+                    Job
+                    <p-sortIcon field="jobTitle"/>
+                </th>
+                <th pSortableColumn="userName">
+                    User
+                    <p-sortIcon field="userName"/>
+                </th>
+                <th pSortableColumn="status">
+                    status
+                    <p-sortIcon field="id"/>
+                </th>
+                <th class="w-36" pSortableColumn="appliedAt">
+                    AppliedAt
+                    <p-sortIcon field="appliedAt"/>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-application let-rowIndex="rowIndex">
+            <tr class="hidden md:table-row">
+                <td>{{ rowIndex + 1 }}</td>
+                <td>{{ application.jobTitle }}</td>
+                <td>{{ application.userName }}</td>
+                <td>
+                    <p-tag
+                        [severity]="getStatusLabel(application.status).severity"> {{ getStatusLabel(application.status).label }}
+                    </p-tag>
+                </td>
+                <td>{{ application.appliedAt | date:'dd-MM-yyyy' }}</td>
+                <td>
+                    <p-button variant="outlined" (click)="openDetails(application.id)" [pTooltip]="'View application'">
+                        <i class="pi pi-eye"></i></p-button>
+                </td>
+            </tr>
+            <tr class="md:hidden">
+                <td colspan="6" class="p-0! border-0!">
+
+                    @let status = getStatusLabel(application.status);
+
+                    <div class="border rounded-md p-2 mt-2 shadow-sm">
+
+                        <div class="flex justify-between items-start gap-2">
+
+                            <div class="min-w-0">
+                                <h5 class="font-medium text-xs! truncate">
+                                    {{ application.jobTitle }}
+                                </h5>
+
+                                <span class="text-[10px] text-gray-400">
+                            #{{ rowIndex + 1 }}
+                        </span>
+                            </div>
+
+                            <p-tag
+                                [severity]="status.severity"
+                                [value]="status.label"
+                                styleClass="text-[10px]!"
+                            />
+                        </div>
+
+                        <div class="mt-2 text-[11px]">
+
+                            <div class="flex justify-between gap-2">
+                        <span class="text-gray-400">
+                            User
+                        </span>
+
+                                <span class="font-medium truncate">
+                            {{ application.userName }}
+                        </span>
+                            </div>
+
+                            <div class="flex justify-between mt-1">
+                        <span class="text-gray-400">
+                            Applied
+                        </span>
+
+                                <span class="font-medium">
+                            {{ application.appliedAt | date:'dd.MM.yy' }}
+                        </span>
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-end mt-2 pt-1 border-t">
+
+                            <p-button
+                                icon="pi pi-eye"
+                                variant="outlined"
+                                size="small"
+                                severity="primary"
+                                pTooltip="View application"
+                                tooltipPosition="top"
+                                [style]="{
+                            width: '26px',
+                            height: '26px'
+                        }"
+                                (onClick)="openDetails(application.id)"
+                            />
+
+                        </div>
+
+                    </div>
+
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+            <tr>
+                <td colspan="6">
+                    <p class="text-center">Data not found</p>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-card>
+<p-dialog
+    [(visible)]="visibleDetails"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '650px' }"
+    header="Application Details"
+>
+    <div class="flex flex-col gap-6">
+        <div>
+            <h4 class="mb-3 text-lg font-semibold">
+                Job Information
+            </h4>
+
+            <div class="rounded-lg border border-gray-200 p-4">
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">
+                        Position
+                    </span>
+
+                    <p class="mt-1 text-lg font-semibold">
+                        {{ detailApplication().job?.title || '—' }}
+                    </p>
+                </div>
+
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">
+                        Description
+                    </span>
+
+                    <p class="mt-1 text-sm text-gray-700">
+                        {{ detailApplication().job?.description || 'No description' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-sm text-gray-500">
+                            Minimum GPA
+                        </span>
+
+                        <p class="mt-1 font-medium">
+                            {{ detailApplication().job?.minGpa ?? '—' }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <span class="text-sm text-gray-500">
+                            Minimum Experience
+                        </span>
+
+                        <p class="mt-1 font-medium">
+                            {{ detailApplication().job?.minExperience ?? 0 }} months
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="mb-3 text-lg font-semibold">
+                Applicant
+            </h4>
+
+            <div class="rounded-lg border border-gray-200 p-4">
+
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">
+                        Name
+                    </span>
+
+                    <p class="mt-1 font-semibold">
+                        {{ detailApplication().student?.name || '—' }}
+                    </p>
+                </div>
+
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">
+                        Email
+                    </span>
+
+                    <p class="mt-1">
+                        {{ detailApplication().student?.email || '—' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-sm text-gray-500">
+                            GPA
+                        </span>
+
+                        <p class="mt-1 font-semibold">
+                            {{ detailApplication().student?.profile?.gpa ?? '—' }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <span class="text-sm text-gray-500">
+                            Experience
+                        </span>
+
+                        <p class="mt-1 font-semibold">
+                            {{ detailApplication().student?.profile?.experienceMonths ?? 0 }}
+                            months
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div>
+            <h4 class="mb-3 text-lg font-semibold">
+                Skills
+            </h4>
+
+            <div class="flex flex-wrap gap-2">
+                @for (skill of detailApplication().student?.skills ?? []; track skill.id) {
+                    <p-tag
+                        [value]="skill.name + ' · ' + skill.level"
+                        severity="info"
+                    />
+                }
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+            <div>
+                <span class="text-sm text-gray-500">
+                    Application Status
+                </span>
+
+                <p class="mt-1 text-sm">
+                    Submitted on
+                    {{ detailApplication().appliedAt | date:'dd.MM.yyyy HH:mm' }}
+                </p>
+            </div>
+
+            <p-tag
+                [value]="getStatusLabel(detailApplication().status)?.label || 'Unknown'"
+                [severity]="getStatusLabel(detailApplication().status)?.severity"
+            />
+        </div>
+
+    </div>
+
+    <ng-template #footer>
+        <p-button
+            label="Close"
+            severity="secondary"
+            [outlined]="true"
+            (click)="closeDetails()"
+        />
+    </ng-template>
+</p-dialog>
