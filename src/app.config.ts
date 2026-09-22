@@ -8,7 +8,7 @@ import {providePrimeNG} from 'primeng/config';
 
 import {appRoutes} from './app.routes';
 import {authInterceptor} from "@/app/core/interceptors/auth-interceptor";
-
+import { PageTitleService } from './app/core/services/page-title.service';
 
 export const EduRankPreset = definePreset(Aura, {
     primitive: {
@@ -98,6 +98,6 @@ export const appConfig: ApplicationConfig = {
                 }
             }
         }),
-
+        PageTitleService
     ]
 };

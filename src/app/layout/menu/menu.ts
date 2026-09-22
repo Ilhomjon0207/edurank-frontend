@@ -22,6 +22,7 @@ export class Menu {
                     { label: 'Applications', icon: 'pi pi-fw pi-file', routerLink: ['/applications'] },
                     { label: 'Ranking', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/ranking'] },
                     { label: 'Jobs', icon: 'pi pi-fw pi-briefcase', routerLink: ['/jobs'] },
+                    { label: 'Criteria', icon: 'pi pi-fw pi-list', routerLink: ['/criterion'] },
                 ]
             },
             // {

@@ -1,0 +1,87 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="p-2 sm:p-4">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-start sm:items-center">
+            <p-iconfield iconPosition="left" class="w-full sm:w-auto">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input pInputText type="text" (input)="onFilter($event)" placeholder="Search Criteria..." class="w-full" />
+            </p-iconfield>
+        </div>
+        <p-button label="Add New Criterion" icon="pi pi-plus" (onClick)="openNew()" class="w-full sm:w-auto"></p-button>
+    </div>
+
+    <p-table [value]="filteredCriteria()" [loading]="loading()" [paginator]="true" [rows]="10"
+             responsiveLayout="stack" [breakpoint]="'960px'" styleClass="p-datatable-sm"
+             [globalFilterFields]="['name','description']">
+        <ng-template pTemplate="header">
+            <tr class="bg-gray-50">
+                <th class="text-gray-600 font-semibold">#</th>
+                <th class="text-gray-600 font-semibold">Name</th>
+                <th class="text-gray-600 font-semibold">Weight</th>
+                <th class="text-gray-600 font-semibold">Description</th>
+                <th class="text-right text-gray-600 font-semibold">Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-criterion let-rowIndex="rowIndex">
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="py-3">
+                    <span class="block font-semibold text-gray-600 sm:hidden">No: </span>
+                    {{ rowIndex + 1 }}
+                </td>
+                <td class="py-3">
+                    <span class="block font-semibold text-gray-600 sm:hidden">Name: </span>
+                    {{ criterion.name }}
+                </td>
+                <td class="py-3">
+                    <span class="block font-semibold text-gray-600 sm:hidden">Weight: </span>
+                    {{ criterion.weight }}
+                </td>
+                <td class="py-3">
+                    <span class="block font-semibold text-gray-600 sm:hidden">Description: </span>
+                    {{ criterion.description }}
+                </td>
+                <td class="py-3">
+                    <div class="flex flex-col sm:hidden mb-2">
+                        <span class="block font-semibold text-gray-600">Actions: </span>
+                    </div>
+                    <div class="flex justify-end gap-2 ml-auto">
+                        <p-button icon="pi pi-pencil" severity="secondary" (onClick)="edit(criterion)" pTooltip="Edit criterion"></p-button>
+                        <p-button icon="pi pi-trash" severity="danger" (onClick)="delete(criterion.id)" pTooltip="Delete criterion"></p-button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr class="text-center">
+                <td colspan="5" class="p-8 text-gray-500">No criteria found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog header="Criterion Details" [visible]="displayDialog()" (visibleChange)="displayDialog.set($event)" [modal]="true" [style]="{width: '90vw', 'max-width': '450px'}">
+    <div class="flex flex-col gap-4 mt-2">
+        <div class="flex flex-col gap-2">
+            <label for="name" class="text-sm font-medium text-gray-700">Name</label>
+            <input pInputText id="name" [(ngModel)]="criterion().name" placeholder="Enter criterion name" class="w-full" />
+        </div>
+        <div class="flex flex-col gap-2">
+            <label for="weight" class="text-sm font-medium text-gray-700">Weight</label>
+            <p-inputNumber id="weight" [(ngModel)]="criterion().weight" mode="decimal" [min]="0" [step]="0.1" styleClass="w-full"></p-inputNumber>
+        </div>
+        <div class="flex flex-col gap-2">
+            <label for="description" class="text-sm font-medium text-gray-700">Description</label>
+            <textarea pInputTextarea id="description" [(ngModel)]="criterion().description" rows="3" placeholder="Enter description" class="w-full block"></textarea>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="flex flex-col sm:flex-row justify-end gap-2 w-full">
+            <p-button label="Cancel" severity="secondary" (onClick)="displayDialog.set(false)" class="w-full sm:w-auto order-2 sm:order-1"></p-button>
+            <p-button label="Save" (onClick)="save()" class="w-full sm:w-auto order-1 sm:order-2"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>
