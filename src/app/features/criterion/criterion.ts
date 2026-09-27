@@ -14,7 +14,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { CriterionService } from './criterion.service';
-import { ICreateCriterion, ICriterion } from '../../core/interfaces/criterion.interface';
+import { ICreateCriterion, ICriterion } from '../../core/interfaces';
 import { Textarea } from 'primeng/textarea';
 
 @Component({

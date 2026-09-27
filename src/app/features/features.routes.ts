@@ -26,6 +26,11 @@ const routes: Routes = [
         loadComponent: () => import('./criterion/criterion').then((c) => c.Criterion),
         data: { title: 'Criteria' }
     },
+    {
+        path: 'profile',
+        loadComponent: () => import('./profile/profile').then((m) => m.Profile),
+        data: { title: 'Profile' }
+    },
 ];
 
 export default routes;
