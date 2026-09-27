@@ -23,8 +23,10 @@ export class Menu {
                     { label: 'Ranking', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/ranking'] },
                     { label: 'Jobs', icon: 'pi pi-fw pi-briefcase', routerLink: ['/jobs'] },
                     { label: 'Criteria', icon: 'pi pi-fw pi-list', routerLink: ['/criterion'] },
+                    { label: 'Skills', icon: 'pi pi-fw pi-tag', routerLink: ['/skills'] },
                 ]
             },
+
             // {
             //     label: 'UI Components',
             //     items: [

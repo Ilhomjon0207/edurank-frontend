@@ -1,11 +1,21 @@
 export interface ISkills {
-    id: number;
+    id: string;
     name: string;
     description: string;
+}
+
+export interface ICreateSkill {
+    name: string;
+    description?: string;
+}
+
+export interface IUpdateSkill {
+    name?: string;
+    description?: string;
 }
 
 export interface IJobSkill {
     skillId: string;
     requiredLevel: number;
-    skill:ISkills
+    skill: ISkills;
 }

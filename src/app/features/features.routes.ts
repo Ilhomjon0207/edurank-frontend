@@ -31,6 +31,11 @@ const routes: Routes = [
         loadComponent: () => import('./profile/profile').then((m) => m.Profile),
         data: { title: 'Profile' }
     },
+    {
+        path: 'skills',
+        loadComponent: () => import('./skills/skills').then((s) => s.Skills),
+        data: { title: 'Skills' }
+    },
 ];
 
 export default routes;
